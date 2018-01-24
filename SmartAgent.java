@@ -2,10 +2,14 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SmartAgent implements Agent{
+public class SmartAgent implements Agent {
+
+	private int homeX, homeY;
+	private int sizeX, sizeY;
+	private int dirtCounter;
 	
-    public void init(Collection<String> percepts) {
-    	
+	
+	public void init(Collection<String> percepts) {
 		/*
 		Possible percepts are:
 		- "(SIZE x y)" denoting the size of the environment, where x,y are integers
@@ -16,7 +20,6 @@ public class SmartAgent implements Agent{
 		The robot is turned off initially, so don't forget to turn it on.
 		 */
     	
-    	
 		Pattern perceptNamePattern = Pattern.compile("\\(\\s*([^\\s]+).*");
 		for (String percept:percepts) {
 			Matcher perceptNameMatcher = perceptNamePattern.matcher(percept);
@@ -25,20 +28,34 @@ public class SmartAgent implements Agent{
 				if (perceptName.equals("HOME")) {
 					Matcher m = Pattern.compile("\\(\\s*HOME\\s+([0-9]+)\\s+([0-9]+)\\s*\\)").matcher(percept);
 					if (m.matches()) {
-						System.out.println("Robot is at " + m.group(1) + "," + m.group(2));
+						System.out.println("Home is at " + m.group(1) + "," + m.group(2));
+						homeX = Integer.parseInt(m.group(1));
+						homeY = Integer.parseInt(m.group(2));
 					}
 				} 
-				if (perceptName.equals("ORIENTATION")) {
-						Matcher m = Pattern.compile("\\(\\s*ORIENTATION\\s+([A-Z]+)\\s*\\)").matcher(percept);
-						if(m.matches())
-						{
-							System.out.println("Orientation is: "  + m.group(1) + ",");
-						}
+				else if (perceptName.equals("ORIENTATION")) {
+					Matcher m = Pattern.compile("\\(\\s*ORIENTATION\\s+([A-Z]+)\\s*\\)").matcher(percept);
+					if(m.matches())
+					{
+						System.out.println("Orientation is: "  + m.group(1));
+					}
 				}
-				if (perceptName.equals("AT DIRT")) {
-					Matcher m = Pattern.compile("\\(\\s*HOME\\s+([0-9]+)\\s+([0-9]+)\\s*\\)").matcher(percept);
+				else if (perceptName.equals("AT")) {
+					Matcher m = Pattern.compile("\\(\\s*AT\\s+([A-Z]+)\\s+([0-9]+)\\s+([0-9]+)\\s*\\)").matcher(percept);
 					if (m.matches()) {
-						System.out.println("Robot is at " + m.group(1) + "," + m.group(2));
+						System.out.println(m.group(1) + " is at: " + m.group(2) + "," + m.group(3));
+						if (m.group(1).contains("DIRT")) { 
+							dirtCounter++;
+							System.out.println("counter is: " + dirtCounter);
+						}
+					}
+				} 
+				else if (perceptName.equals("SIZE")) {
+					Matcher m = Pattern.compile("\\(\\s*SIZE\\s+([0-9]+)\\s+([0-9]+)\\s*\\)").matcher(percept);
+					if (m.matches()) {
+						System.out.println("Size is " + m.group(1) + "," + m.group(2));
+						sizeX = Integer.parseInt(m.group(1));
+						sizeY = Integer.parseInt(m.group(2));
 					}
 				} 
 				else {
@@ -49,13 +66,9 @@ public class SmartAgent implements Agent{
 			}
 		}
     }
+	
     public String nextAction(Collection<String> percepts) {
-    	System.out.print("Perceiving:");
-		for(String percept:percepts) {
-			System.out.print("'" + percept + "', ");
-		}
-		System.out.println("");
-		String[] actions = { "TURN_ON", "TURN_OFF", "TURN_RIGHT", "TURN_LEFT", "GO", "SUCK" };
-		return actions[4];
+    	
+    	return "";
     }
 }
