@@ -7,7 +7,7 @@ public class State {
 	private int[][] dirtPos;
 	private boolean isOn;
 	private boolean isGoal = false;
-	private List legalMoves;
+	private List<String> legalMoves;
 	
 	public void setState(int x, int y, String orientation, boolean isOn, int [][] dirtPos) {
 		this.dirtPos = dirtPos;
