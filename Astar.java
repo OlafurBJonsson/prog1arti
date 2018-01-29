@@ -1,19 +1,11 @@
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-
 class Node
 {
 	int cost, x, y;
 	boolean obstacle = false;
 	List<Node> neighbours = new ArrayList<Node>();
-	List<Node> orderOfNodes = new ArrayList<Node>();
+	List<Node> orderOfNodes = new ArrayList<Node>(); //This is the frontier
 }
 
 
@@ -21,10 +13,7 @@ public class Astar {
 	private Node grid[][];
 	private char obs[][];
 	private int sizex, sizey, destx, desty;
-	private char direction = 'N';
-	private int posx, posy;
 	List<Node> finalPath = new ArrayList<Node>();
-	private String[] actions = { "TURN_ON", "TURN_OFF", "TURN_RIGHT", "TURN_LEFT", "GO", "SUCK" };
 	public Astar(int sizex, int sizey,int startx,int starty, char obs[][])
 	{
 		//Instantiate the class
@@ -91,37 +80,7 @@ public class Astar {
 		
 	}
 	
-	public List<String> getRoute()
-	{
-		List<String> ret = new ArrayList<String>();
-		while(!finalPath.isEmpty()) {
-			//TODO: Create homing logic
-			while(!finalPath.isEmpty())
-			if(posx < finalPath.get(0).x) {
-				if(direction != 'E') ret.add(changeDirection('E'));
-				else ret.add(go());
-			}
-			if(posx > finalPath.get(0).x) {
-				if(direction != 'W')  ret.add(changeDirection('W'));
-				else  ret.add(go());
-			}
-			if(posy < finalPath.get(0).y) {
-				if(direction != 'N')  ret.add(changeDirection('N'));
-				else  ret.add(go());
-			}
-			if(posy > finalPath.get(0).y) {
-				if(direction != 'S')  ret.add(changeDirection('S'));
-				else  ret.add(go());
-			}
-			if(finalPath.get(0).x == posx && finalPath.get(0).y == posy)
-			{
-				finalPath.remove(0);
-			}
 
-			
-		}
-		return ret;
-	}
 	
 	private List<Node> findPath(int x, int y, int destx, int desty)
 	{
@@ -228,80 +187,13 @@ public class Astar {
 		n.x = x;
 		n.y = y;
 		n.cost = Math.abs(x - destx) + Math.abs(y - desty);
+		
 		if(obs[x][y] == 'o')
 		{
 			n.obstacle = true;
 		}
 		return n;
 	}
-	private String turn(String turn)
-	{
-		if(turn == "RIGHT")
-		{
-			if(direction == 'N') {
-				direction = 'E';
-			}
-			else if(direction == 'E') {
-				direction = 'S';
-			}
-			else if(direction == 'S') {
-				direction = 'W';
-			}
-			else if(direction == 'W') {
-				direction = 'N';
-			}
-			return actions[2];
-		}
-		else
-		{
-			if(direction == 'N') {
-				direction = 'W';
-			}
-			else if(direction == 'E') {
-				direction = 'N';
-			}
-			else if(direction == 'S') {
-				direction = 'E';
-			}
-			else if(direction == 'W') {
-				direction = 'S';
-			}
-			
-			return actions[3];
-		}
-	}
-	
-	private String changeDirection(char c)
-	{
-		if(c == 'E' && (direction == 'N' || direction == 'W')) return turn("RIGHT");
-		if(c == 'E' && direction == 'S') return turn("LEFT");
-		if(c == 'N' && (direction == 'S' || direction == 'W')) return turn("RIGHT");
-		if(c == 'N' && direction == 'E') return turn("LEFT");
-		if(c == 'S' && (direction == 'N' || direction == 'E')) return turn("RIGHT");
-		if(c == 'S' && direction == 'W') return turn("LEFT");
-		if(c == 'W' && (direction == 'E' || direction == 'S')) return turn("RIGHT");
-		if(c == 'W' && direction == 'N') return turn("LEFT");
-		
-		
-		System.out.println("Direction not found, turning right by default");
-		return actions[2];
-	}
-	
-	private String go() {
-		if(direction == 'N') {
-			posy++;
-		}
-		if(direction == 'E') {
-			posx++;
-		}
-		if(direction == 'S') {
-			posy--;
-		}
-		if(direction == 'W') {
-			posx--;
-		}
-		return actions[4];
 
-	}
+
 }
-
