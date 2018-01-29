@@ -4,24 +4,18 @@ public class State {
 	
 	private String orientation;
 	private int x, y;
-	private boolean hasDirt;
 	//private boolean isOn;
 	//private boolean isGoal = false;
 	private List<String> legalMoves;
 	
-	public void setState(int x, int y, String orientation, boolean hasDirt) {
-		this.hasDirt = hasDirt;
-		//this.isOn = isOn;
+	public State(int x, int y, String orientation) {
 		this.orientation = orientation;
 		this.x = x;
 		this.y = y;
 	}
+
 	
-	public boolean hasDirt() {
-		return hasDirt;
-	}
-	
-	public List<String> getLegalMoves (MyMap[][] map, int sizeX, int sizeY) {
+	public List<String> getLegalMoves (char[][] obs, int sizeX, int sizeY) {
 		
 		legalMoves.add("TURN_LEFT");
 		legalMoves.add("TURN_RIGHT");
@@ -29,28 +23,28 @@ public class State {
 		
 		switch (orientation) {
 		case "NORTH":
-			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("GO");
-			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("TURN_RIGHT");
-			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("TURN_LEFT");
+			if (y == sizeY || obs[x][y+1] == 'o') 	legalMoves.remove("GO");
+			if (x == sizeX || obs[x+1][y] == 'o') 	legalMoves.remove("TURN_RIGHT");
+			if (x == 1 || obs[x-1][y] == 'o') 		legalMoves.remove("TURN_LEFT");
 			
 			return legalMoves;
 			
 		case "SOUTH":
-			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("GO");
-			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("TURN_RIGHT");
-			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("TURN_LEFT");
+			if (y == 1 || obs[x][y-1] == 'o') 		legalMoves.remove("GO");
+			if (x == 1 || obs[x-1][y] == 'o') 		legalMoves.remove("TURN_RIGHT");
+			if (x == sizeX || obs[x+1][y] == 'o') 	legalMoves.remove("TURN_LEFT");
 			
 			return legalMoves;
 		case "EAST":
-			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("GO");
-			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("TURN_RIGHT");
-			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("TURN_LEFT");
+			if (x == sizeX || obs[x+1][y] == 'o') 	legalMoves.remove("GO");
+			if (y == sizeY || obs[x][y+1] == 'o') 	legalMoves.remove("TURN_RIGHT");
+			if (y == 1 || obs[x][y-1] == 'o') 		legalMoves.remove("TURN_LEFT");
 				
 			return legalMoves;
 		case "WEST":
-			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("GO");
-			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("TURN_RIGHT");
-			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("TURN_LEFT");
+			if (x == 1 || obs[x-1][y] == 'o') 		legalMoves.remove("GO");
+			if (y == 1 || obs[x][y-1] == 'o') 		legalMoves.remove("TURN_RIGHT");
+			if (y == sizeY || obs[x][y+1] == 'o') 	legalMoves.remove("TURN_LEFT");
 				
 			return legalMoves;
 			
