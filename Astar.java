@@ -13,7 +13,7 @@ class Node
 	int cost, x, y;
 	boolean obstacle = false;
 	List<Node> neighbours = new ArrayList<Node>();
-	List<Node> orderOfNodes = new ArrayList<Node>();
+	List<Node> orderOfNodes = new ArrayList<Node>(); //This is the frontier
 }
 
 public class Astar {
@@ -145,10 +145,31 @@ public class Astar {
 		n.x = x;
 		n.y = y;
 		n.cost = Math.abs(x - destx) + Math.abs(y - desty);
+		
 		if(obs[x][y] == 'o')
 		{
 			n.obstacle = true;
 		}
 		return n;
+	}
+	
+	private int distance (int x, int y, int destx, int desty) {
+		return 	Math.abs(x - destx) + Math.abs(y - desty);
+		
+	}
+		
+	
+	List<Node> front = new ArrayList<Node>();
+	front.add(grid[startx-1][starty-1]);
+	
+	int minim = distance(front.get(front-1).x, front.get(front.size()-1).y, dirtLeft.get(0).x, dirtLeft.get(0).y);
+	int index = 0;
+	while (front.length < dirtleft.size() ) {
+		for (i = 0, i< dirtleft.size(), i++) {
+			if (distance(front.get(0).x, front.get(0).y, dirtLeft.get(0).x, dirtLeft.get(0).y) < minim) {
+				index = i;
+			}
+		}
+		front.add(grid[startx-1][starty-1]);
 	}
 }
