@@ -16,11 +16,15 @@ class Node
 	List<Node> orderOfNodes = new ArrayList<Node>();
 }
 
+
 public class Astar {
 	private Node grid[][];
 	private char obs[][];
 	private int sizex, sizey, destx, desty;
-	
+	private char direction = 'N';
+	private int posx, posy;
+	List<Node> finalPath = new ArrayList<Node>();
+	private String[] actions = { "TURN_ON", "TURN_OFF", "TURN_RIGHT", "TURN_LEFT", "GO", "SUCK" };
 	public Astar(int sizex, int sizey,int startx,int starty, char obs[][])
 	{
 		//Instantiate the class
@@ -30,35 +34,93 @@ public class Astar {
 		this.destx = 4; //CHANGE THIS
 		this.desty = 4;
 		grid = new Node[sizex][sizey];
-		List<Node> path = new ArrayList<Node>();
 		
-		//Get cost for all nodes
-		for(int i = 0; i < this.sizex; i++)
+		List<Node> dirtLeft = new ArrayList<Node>();
+		
+		
+		
+		getCost();
+
+		
+		finalPath.add(grid[startx-1][starty-1]);
+		Node curr = grid[startx-1][starty-1];
+		for(int i = 0; i < this.sizex;i++)
 		{
 			for(int j = 0; j < this.sizey; j++)
 			{
-				grid[i][j] = getCost(i, j);
-				System.out.println(grid[i][j].x+ ", " + grid[i][j].y + " Cost: " + grid[i][j].cost);
+				if(obs[i][j] == 'd')
+				{
+					dirtLeft.add(grid[i][j]);
+				}
 			}
+		}
+		while(!dirtLeft.isEmpty())
+		{
+			List<Node> shortestPath = new ArrayList<Node>();
+			int index = 0;
+			for(int i = 0; i < dirtLeft.size();i++)
+			{
+				this.destx = dirtLeft.get(i).x;
+				this.desty = dirtLeft.get(i).y;
+				getCost();
+				List<Node> currentPath = findPath(curr.x, curr.y, dirtLeft.get(i).x, dirtLeft.get(i).y);
+				if(currentPath.size() < shortestPath.size() || shortestPath.size() == 0)
+					{
+						shortestPath = currentPath;
+						index = i;
+					}
+			}
+			dirtLeft.remove(index);
+			for(Node i:shortestPath)
+			{
+				finalPath.add(i);
+			}
+			curr = finalPath.get(finalPath.size()-1);
 		}
 		
-		//Find all neighbours for every Node.
-		for(int i = 0; i < this.sizex; i++)
-		{
-			for(int j = 0; j < this.sizey; j++)
-			{
-				grid[i][j].neighbours = getNeighbours(grid[i][j]);
-				System.out.println(grid[i][j].x+ ", " + grid[i][j].y + " Cost: " + grid[i][j].cost);
-			}
-		}
-		path = findPath(0,0,4,4);
-		for(Node item:path)
+		for(Node item:finalPath)
 		{
 			System.out.println("Next node: " + item.x + ", " + item.y);
 		}
 		
 		
+		//translate the path to a language the robot understand. 
 		
+		
+		
+		
+	}
+	
+	public List<String> getRoute()
+	{
+		List<String> ret = new ArrayList<String>();
+		while(!finalPath.isEmpty()) {
+			//TODO: Create homing logic
+			while(!finalPath.isEmpty())
+			if(posx < finalPath.get(0).x) {
+				if(direction != 'E') ret.add(changeDirection('E'));
+				else ret.add(go());
+			}
+			if(posx > finalPath.get(0).x) {
+				if(direction != 'W')  ret.add(changeDirection('W'));
+				else  ret.add(go());
+			}
+			if(posy < finalPath.get(0).y) {
+				if(direction != 'N')  ret.add(changeDirection('N'));
+				else  ret.add(go());
+			}
+			if(posy > finalPath.get(0).y) {
+				if(direction != 'S')  ret.add(changeDirection('S'));
+				else  ret.add(go());
+			}
+			if(finalPath.get(0).x == posx && finalPath.get(0).y == posy)
+			{
+				finalPath.remove(0);
+			}
+
+			
+		}
+		return ret;
 	}
 	
 	private List<Node> findPath(int x, int y, int destx, int desty)
@@ -139,6 +201,27 @@ public class Astar {
 		}
 		return nl;
 	}
+	private void getCost()
+	{
+		//Get cost for all nodes
+		for(int i = 0; i < this.sizex; i++)
+		{
+			for(int j = 0; j < this.sizey; j++)
+			{
+				grid[i][j] = getCost(i, j);
+				//System.out.println(grid[i][j].x+ ", " + grid[i][j].y + " Cost: " + grid[i][j].cost);
+				
+			}
+		}
+		for(int i = 0; i < this.sizex;i++)
+		{
+			for(int j = 0; j < this.sizey; j++)
+			{
+				grid[i][j].neighbours = getNeighbours(grid[i][j]);
+				System.out.println(grid[i][j].x+ ", " + grid[i][j].y + " Cost: " + grid[i][j].cost);
+			}
+		}
+	}
 	private Node getCost(int x, int y)
 	{
 		Node n = new Node();
@@ -151,4 +234,74 @@ public class Astar {
 		}
 		return n;
 	}
+	private String turn(String turn)
+	{
+		if(turn == "RIGHT")
+		{
+			if(direction == 'N') {
+				direction = 'E';
+			}
+			else if(direction == 'E') {
+				direction = 'S';
+			}
+			else if(direction == 'S') {
+				direction = 'W';
+			}
+			else if(direction == 'W') {
+				direction = 'N';
+			}
+			return actions[2];
+		}
+		else
+		{
+			if(direction == 'N') {
+				direction = 'W';
+			}
+			else if(direction == 'E') {
+				direction = 'N';
+			}
+			else if(direction == 'S') {
+				direction = 'E';
+			}
+			else if(direction == 'W') {
+				direction = 'S';
+			}
+			
+			return actions[3];
+		}
+	}
+	
+	private String changeDirection(char c)
+	{
+		if(c == 'E' && (direction == 'N' || direction == 'W')) return turn("RIGHT");
+		if(c == 'E' && direction == 'S') return turn("LEFT");
+		if(c == 'N' && (direction == 'S' || direction == 'W')) return turn("RIGHT");
+		if(c == 'N' && direction == 'E') return turn("LEFT");
+		if(c == 'S' && (direction == 'N' || direction == 'E')) return turn("RIGHT");
+		if(c == 'S' && direction == 'W') return turn("LEFT");
+		if(c == 'W' && (direction == 'E' || direction == 'S')) return turn("RIGHT");
+		if(c == 'W' && direction == 'N') return turn("LEFT");
+		
+		
+		System.out.println("Direction not found, turning right by default");
+		return actions[2];
+	}
+	
+	private String go() {
+		if(direction == 'N') {
+			posy++;
+		}
+		if(direction == 'E') {
+			posx++;
+		}
+		if(direction == 'S') {
+			posy--;
+		}
+		if(direction == 'W') {
+			posx--;
+		}
+		return actions[4];
+
+	}
 }
+
