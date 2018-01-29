@@ -1,13 +1,21 @@
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+final class Item{
+	int y, x;
+}
 
 public class SmartAgent implements Agent {
 
 	private int homeX, homeY;
 	private int sizeX, sizeY;
 	private int dirtCounter;
-	
+	private char obs[][];
+	private List<Item> dirt = new ArrayList<Item>();
+	private List<Item> obstacle = new ArrayList<Item>(); 
 	
 	public void init(Collection<String> percepts) {
 		/*
@@ -47,6 +55,16 @@ public class SmartAgent implements Agent {
 						if (m.group(1).contains("DIRT")) { 
 							dirtCounter++;
 							System.out.println("counter is: " + dirtCounter);
+							Item d = new Item();
+							d.x = Integer.parseInt(m.group(2));
+							d.y = Integer.parseInt(m.group(3));
+							dirt.add(d);
+						}
+						else{
+							Item o = new Item();
+							o.x = Integer.parseInt(m.group(2));
+							o.y = Integer.parseInt(m.group(3));
+							obstacle.add(o);
 						}
 					}
 				} 
@@ -57,7 +75,7 @@ public class SmartAgent implements Agent {
 						sizeX = Integer.parseInt(m.group(1));
 						sizeY = Integer.parseInt(m.group(2));
 					}
-				} 
+				}
 				else {
 					System.out.println("Other: " + percept);
 				}
@@ -65,6 +83,18 @@ public class SmartAgent implements Agent {
 				System.err.println("strange percept that does not match pattern: " + percept);
 			}
 		}
+		obs = new char[sizeX][sizeY];
+		
+		for(Item item:dirt)
+		{
+			obs[item.x-1][item.y-1] = 'd';
+		}
+		for(Item item:obstacle)
+		{
+			obs[item.x-1][item.y-1] = 'o';
+		}
+		Astar a = new Astar(sizeX, sizeY, homeX, homeY, obs);
+		
     }
 	
     public String nextAction(Collection<String> percepts) {
@@ -74,6 +104,6 @@ public class SmartAgent implements Agent {
 	}
 	System.out.println("");
 	String[] actions = { "TURN_ON", "TURN_OFF", "TURN_RIGHT", "TURN_LEFT", "GO", "SUCK" };
-	return actions[4];
+	return actions[1];
     }
 }
