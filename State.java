@@ -4,52 +4,57 @@ public class State {
 	
 	private String orientation;
 	private int x, y;
-	private int[][] dirtPos;
-	private boolean isOn;
-	private boolean isGoal = false;
+	private boolean hasDirt;
+	//private boolean isOn;
+	//private boolean isGoal = false;
 	private List<String> legalMoves;
 	
-	public void setState(int x, int y, String orientation, boolean isOn, int [][] dirtPos) {
-		this.dirtPos = dirtPos;
-		this.isOn = isOn;
+	public void setState(int x, int y, String orientation, boolean hasDirt) {
+		this.hasDirt = hasDirt;
+		//this.isOn = isOn;
 		this.orientation = orientation;
 		this.x = x;
 		this.y = y;
 	}
 	
-	public List getLegalMoves (boolean[][] obs, int sizeX, int sizeY) {
+	public boolean hasDirt() {
+		return hasDirt;
+	}
+	
+	public List<String> getLegalMoves (MyMap[][] map, int sizeX, int sizeY) {
+		
+		legalMoves.add("TURN_LEFT");
+		legalMoves.add("TURN_RIGHT");
+		legalMoves.add("GO");
+		
 		switch (orientation) {
 		case "NORTH":
-			if (sizeY == y || obs[x][y+1] == true) {
-				legalMoves.add("TURN_LEFT");
-				legalMoves.add("TURN_RIGHT");
-			}
-
+			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("GO");
+			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("TURN_RIGHT");
+			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("TURN_LEFT");
+			
 			return legalMoves;
+			
 		case "SOUTH":
-			if (sizeY == 1 || obs[x][y-1] == true) {
-				legalMoves.add("TURN_LEFT");
-				legalMoves.add("TURN_RIGHT");
-			}
+			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("GO");
+			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("TURN_RIGHT");
+			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("TURN_LEFT");
+			
 			return legalMoves;
 		case "EAST":
-			if (sizeX == x || obs[x+1][y] == true) {
-				legalMoves.add("TURN_LEFT");
-				legalMoves.add("TURN_RIGHT");
-			}
+			if (x == sizeX || map[x+1][y].isObsticle) 	legalMoves.remove("GO");
+			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("TURN_RIGHT");
+			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("TURN_LEFT");
+				
 			return legalMoves;
 		case "WEST":
-			if (sizeX == 1 || obs[x-1][y] == true) {
-				legalMoves.add("TURN_LEFT");
-				legalMoves.add("TURN_RIGHT");
-			}
+			if (x == 1 || map[x-1][y].isObsticle) 		legalMoves.remove("GO");
+			if (y == 1 || map[x][y-1].isObsticle) 		legalMoves.remove("TURN_RIGHT");
+			if (y == sizeY || map[x][y+1].isObsticle) 	legalMoves.remove("TURN_LEFT");
+				
 			return legalMoves;
 			
 		default:
-			legalMoves.add("TURN_LEFT");
-			legalMoves.add("TURN_RIGHT");
-			legalMoves.add("GO");
-		
 			return legalMoves;
 		}
 	}
